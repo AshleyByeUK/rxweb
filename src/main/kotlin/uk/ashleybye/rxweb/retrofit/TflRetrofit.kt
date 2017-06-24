@@ -1,4 +1,4 @@
-package uk.ashleybye.rxweb.services
+package uk.ashleybye.rxweb.retrofit
 
 import com.github.salomonbrys.kodein.Kodein
 import com.github.salomonbrys.kodein.bind
@@ -12,34 +12,28 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
+import uk.ashleybye.rxweb.models.TflArrival
+import uk.ashleybye.rxweb.models.TflLine
+import uk.ashleybye.rxweb.models.TflStation
 
 
-interface TflService {
+interface TflRetrofit {
     @GET("Line/Mode/tube")
-    fun getAllUndergroundLines(): Observable<List<UndergroundLine>>
+    fun getAllUndergroundLines(): Observable<List<TflLine>>
 
     @GET("/Line/{lineName}/StopPoints")
     fun getStationsForUndergroundLine(
             @Path("lineName") lineName: String
-    ): Observable<List<UndergroundStation>>
+    ): Observable<List<TflStation>>
 
     @GET("/Line/{lineName}/Arrivals")
     fun getArrivalsFor(
             @Path("lineName") lineName: String,
             @Query("stopPointId") stationNaptanId: String
-    ) : Observable<List<Arrival>>
+    ) : Observable<List<TflArrival>>
 }
 
-data class UndergroundLine(val id: String, val name: String)
-data class UndergroundStation(val naptanId: String, val commonName: String)
-data class Arrival(
-        val platformName: String,
-        val towards: String,
-        val currentLocation: String,
-        val expectedArrival:  String)
-
-
-object KodeinTflService {
+object KodeinTflRetrofit {
     val module = Kodein.Module {
         val moshi = Moshi.Builder()
                 .add(KotlinJsonAdapterFactory())
@@ -51,8 +45,8 @@ object KodeinTflService {
                 .addConverterFactory(MoshiConverterFactory.create(moshi))
                 .build()
 
-        val tflService: TflService = retrofit.create(TflService::class.java)
+        val tflRetrofit: TflRetrofit = retrofit.create(TflRetrofit::class.java)
 
-        bind<TflService>() with instance(tflService)
+        bind() from instance(tflRetrofit)
     }
 }
