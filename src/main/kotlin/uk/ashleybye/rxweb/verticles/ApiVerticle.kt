@@ -2,26 +2,31 @@ package uk.ashleybye.rxweb.verticles
 
 import com.github.salomonbrys.kodein.Kodein
 import com.github.salomonbrys.kodein.conf.global
+import com.github.salomonbrys.kodein.instance
 import io.vertx.core.AbstractVerticle
 import io.vertx.core.Future
 import io.vertx.core.Vertx
 import io.vertx.ext.web.Router
 import uk.ashleybye.rxweb.api.TflRestController
 import uk.ashleybye.rxweb.api.TflStreamController
+import uk.ashleybye.rxweb.config.Configuration
+import uk.ashleybye.rxweb.config.KodeinConfiguration
 import uk.ashleybye.rxweb.retrofit.KodeinTflRetrofit
 import uk.ashleybye.rxweb.services.KodeinTflRestService
 import uk.ashleybye.rxweb.services.KodeinTflStreamService
 
 
 class ApiVerticle : AbstractVerticle() {
+
     override fun start(startFuture: Future<Void>?) {
         configureKodein()
 
+        val configuration = Kodein.global.instance<Configuration>()
         val apiRouter = configureRouter(vertx)
 
         vertx.createHttpServer()
                 .requestHandler { apiRouter.accept(it) }
-                .listen(8080, { result ->
+                .listen(configuration.server.port, { result ->
                     if (result.succeeded()) {
                         startFuture?.complete()
                     } else {
@@ -34,6 +39,9 @@ class ApiVerticle : AbstractVerticle() {
     private fun configureKodein() {
         // Injection starting point.
         Kodein.global.addImport(Kodein.Module {
+            // Import configuration.
+            KodeinConfiguration.init(vertx, config())
+            import(KodeinConfiguration.module)
             // Import services.
             import(KodeinTflRetrofit.module)
             import(KodeinTflStreamService.module)

@@ -2,6 +2,7 @@ package uk.ashleybye.rxweb.retrofit
 
 import com.github.salomonbrys.kodein.Kodein
 import com.github.salomonbrys.kodein.bind
+import com.github.salomonbrys.kodein.conf.global
 import com.github.salomonbrys.kodein.instance
 import com.squareup.moshi.KotlinJsonAdapterFactory
 import com.squareup.moshi.Moshi
@@ -12,6 +13,7 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
+import uk.ashleybye.rxweb.config.Configuration
 import uk.ashleybye.rxweb.models.TflArrival
 import uk.ashleybye.rxweb.models.TflLine
 import uk.ashleybye.rxweb.models.TflStation
@@ -19,17 +21,24 @@ import uk.ashleybye.rxweb.models.TflStation
 
 interface TflRetrofit {
     @GET("Line/Mode/tube")
-    fun getAllUndergroundLines(): Observable<List<TflLine>>
+    fun getAllUndergroundLines(
+            @Query("app_key") appKey: String = Kodein.global.instance<Configuration>().apiKeys.tfl.appKey,
+            @Query("appId") appId: String = Kodein.global.instance<Configuration>().apiKeys.tfl.appId
+    ): Observable<List<TflLine>>
 
     @GET("/Line/{lineName}/StopPoints")
     fun getStationsForUndergroundLine(
-            @Path("lineName") lineName: String
+            @Path("lineName") lineName: String,
+            @Query("app_key") appKey: String = Kodein.global.instance<Configuration>().apiKeys.tfl.appKey,
+            @Query("appId") appId: String = Kodein.global.instance<Configuration>().apiKeys.tfl.appId
     ): Observable<List<TflStation>>
 
     @GET("/Line/{lineName}/Arrivals")
     fun getArrivalsFor(
             @Path("lineName") lineName: String,
-            @Query("stopPointId") stationNaptanId: String
+            @Query("stopPointId") stationNaptanId: String,
+            @Query("app_key") appKey: String = Kodein.global.instance<Configuration>().apiKeys.tfl.appKey,
+            @Query("app_id") appId: String = Kodein.global.instance<Configuration>().apiKeys.tfl.appId
     ) : Observable<List<TflArrival>>
 }
 

@@ -39,6 +39,7 @@ dependencies {
     compile "io.vertx:vertx-core:$vertx_version"
     compile "io.vertx:vertx-web:$vertx_version"
     compile "io.vertx:vertx-rxjava2:3.5.0-SNAPSHOT" // Local repo.
+    compile "io.vertx:vertx-config:$vertx_version"
     compile "com.github.aesteve:vertx-sse:0.1" // Local repo.
     compile "com.github.salomonbrys.kodein:kodein:$kodein_version"
     compile "com.github.salomonbrys.kodein:kodein-conf:$kodein_version"
@@ -62,10 +63,12 @@ compileKotlin {
 
 mainClassName = "io.vertx.core.Launcher"
 def mainVerticleName = "uk.ashleybye.rxweb.verticles.ApiVerticle"
+def configurationFile = "conf/development.json"
 
 run {
     args = ["run",
             mainVerticleName,
-            "--launcher-class=$mainClassName"
+            "--launcher-class=$mainClassName",
+            "-conf $configurationFile"
     ]
 }
