@@ -27,7 +27,7 @@ object Configuration {
                 .setConfig(vertxConfig)
 
         val options = ConfigRetrieverOptions()
-                .setScanPeriod(5000)
+                .setScanPeriod(5000) //TODO(Ash): This won't update read-only properties!
                 .addStore(envStore)
                 .addStore(jsonStore)
 
