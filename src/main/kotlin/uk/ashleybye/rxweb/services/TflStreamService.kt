@@ -1,11 +1,5 @@
 package uk.ashleybye.rxweb.services
 
-import com.github.salomonbrys.kodein.Kodein
-import com.github.salomonbrys.kodein.bind
-import com.github.salomonbrys.kodein.conf.global
-import com.github.salomonbrys.kodein.instance
-import com.github.salomonbrys.kodein.refSingleton
-import com.github.salomonbrys.kodein.softReference
 import io.reactivex.Observable
 import io.reactivex.Scheduler
 import io.reactivex.schedulers.Schedulers
@@ -16,8 +10,9 @@ import uk.ashleybye.rxweb.retrofit.TflRetrofit
 import java.util.concurrent.TimeUnit
 
 
-class TflStreamService(private val tflRetrofit: TflRetrofit = Kodein.global.instance()) {
+object TflStreamService {
 
+    private val tflRetrofit: TflRetrofit = TflRetrofit.instance
     private val STREAM_INTERVAL = 2L
 
     fun streamLines(subscribeScheduler: Scheduler = Schedulers.io(),
@@ -69,11 +64,5 @@ class TflStreamService(private val tflRetrofit: TflRetrofit = Kodein.global.inst
                 .publish()
                 .refCount()
                 .observeOn(observeScheduler)
-    }
-}
-
-object KodeinTflStreamService {
-    val module = Kodein.Module {
-        bind() from refSingleton(softReference) { TflStreamService() }
     }
 }

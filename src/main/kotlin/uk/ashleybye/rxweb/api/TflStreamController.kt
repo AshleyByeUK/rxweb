@@ -1,8 +1,5 @@
 package uk.ashleybye.rxweb.api
 
-import com.github.salomonbrys.kodein.Kodein
-import com.github.salomonbrys.kodein.conf.global
-import com.github.salomonbrys.kodein.instance
 import com.squareup.moshi.KotlinJsonAdapterFactory
 import com.squareup.moshi.Moshi
 import io.reactivex.Scheduler
@@ -15,7 +12,7 @@ import uk.ashleybye.rxweb.models.TflStation
 import uk.ashleybye.rxweb.services.TflStreamService
 
 
-class TflStreamController(private val tflStreamService: TflStreamService = Kodein.global.instance()) {
+class TflStreamController() {
 
     private val MOSHI = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
 
@@ -28,7 +25,7 @@ class TflStreamController(private val tflStreamService: TflStreamService = Kodei
         val sse = SSEHandler.create()
         sse.connectHandler { connection ->
             ConnectableObservable
-                    .defer { tflStreamService.streamLines(subscribeScheduler, observeScheduler) }
+                    .defer { TflStreamService.streamLines(subscribeScheduler, observeScheduler) }
                     .subscribe(
                             { line ->
                                 val json = jsonAdapter.toJson(line)
@@ -53,7 +50,7 @@ class TflStreamController(private val tflStreamService: TflStreamService = Kodei
             val line = connection.request().getParam("line")
 
             ConnectableObservable
-                    .defer { tflStreamService.streamStations(line, subscribeScheduler, observeScheduler) }
+                    .defer { TflStreamService.streamStations(line, subscribeScheduler, observeScheduler) }
                     .subscribe(
                             { station ->
                                 val json = jsonAdapter.toJson(station)
@@ -79,7 +76,7 @@ class TflStreamController(private val tflStreamService: TflStreamService = Kodei
             val station = connection.request().getParam("station")
 
             ConnectableObservable
-                    .defer { tflStreamService.streamArrivals(line, station, subscribeScheduler, observeScheduler) }
+                    .defer { TflStreamService.streamArrivals(line, station, subscribeScheduler, observeScheduler) }
                     .subscribe(
                             { arrival ->
                                 val json = jsonAdapter.toJson(arrival)

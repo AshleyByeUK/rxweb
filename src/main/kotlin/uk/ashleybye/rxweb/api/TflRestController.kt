@@ -1,8 +1,5 @@
 package uk.ashleybye.rxweb.api
 
-import com.github.salomonbrys.kodein.Kodein
-import com.github.salomonbrys.kodein.conf.global
-import com.github.salomonbrys.kodein.instance
 import com.squareup.moshi.KotlinJsonAdapterFactory
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
@@ -17,7 +14,7 @@ import uk.ashleybye.rxweb.models.TflStation
 import uk.ashleybye.rxweb.services.TflRestService
 
 
-class TflRestController(private val tflRestService: TflRestService = Kodein.global.instance()) {
+class TflRestController() {
 
     private val APPLICATION_JSON = "application/json"
     private val MOSHI = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
@@ -30,7 +27,7 @@ class TflRestController(private val tflRestService: TflRestService = Kodein.glob
         val jsonAdapter = MOSHI.adapter<List<TflLine>>(type)
 
         ConnectableObservable
-                .defer { tflRestService.getLines(subscribeScheduler, observeScheduler) }
+                .defer { TflRestService.getLines(subscribeScheduler, observeScheduler) }
                 .subscribe(
                         { lines ->
                             val json = jsonAdapter.toJson(lines)
@@ -53,7 +50,7 @@ class TflRestController(private val tflRestService: TflRestService = Kodein.glob
         val line = routingContext.request().getParam("line")
 
         ConnectableObservable
-                .defer { tflRestService.getStations(line, subscribeScheduler, observeScheduler) }
+                .defer { TflRestService.getStations(line, subscribeScheduler, observeScheduler) }
                 .subscribe(
                         { stations ->
                             val json = jsonAdapter.toJson(stations)
@@ -77,7 +74,7 @@ class TflRestController(private val tflRestService: TflRestService = Kodein.glob
         val station = routingContext.request().getParam("station")
 
         ConnectableObservable
-                .defer { tflRestService.getArrivals(line, station, subscribeScheduler, observeScheduler) }
+                .defer { TflRestService.getArrivals(line, station, subscribeScheduler, observeScheduler) }
                 .subscribe(
                         { arrivals ->
                             val json = jsonAdapter.toJson(arrivals)
